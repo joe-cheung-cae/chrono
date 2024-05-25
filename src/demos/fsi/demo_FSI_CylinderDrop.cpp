@@ -42,7 +42,7 @@ using namespace chrono::fsi;
 ChVisualSystem::Type vis_type = ChVisualSystem::Type::VSG;
 
 // Output directories and settings
-const std::string out_dir = GetChronoOutputPath() + "FSI_Cylinder_Drop/";
+const std::string out_dir = GetChronoOutputPath() + "FSI_Cylinder_Drop_I2SPH/";
 
 // Output frequency
 bool output = true;
@@ -221,7 +221,7 @@ int main(int argc, char* argv[]) {
 
     sysMBS.SetCollisionSystemType(ChCollisionSystem::Type::BULLET);
 
-    std::string inputJson = GetChronoDataFile("fsi/input_json/demo_FSI_CylinderDrop_Explicit.json");
+    std::string inputJson = GetChronoDataFile("fsi/input_json/demo_FSI_CylinderDrop_I2SPH.json");
     if (argc == 1) {
         std::cout << "Use the default JSON file" << std::endl;
     } else if (argc == 2) {
