@@ -17,6 +17,7 @@
 
 # The typical build directory
 /build*
+/cmake-build-*
 /compile_commands.json
 CMakeUserPresets.json
 

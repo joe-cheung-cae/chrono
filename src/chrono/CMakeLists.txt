@@ -756,21 +756,25 @@ endif()
 # CUDA collision group
 
 if (CHRONO_CUDA_FOUND)
-   message(STATUS "Add Chrono CUDA collision detection library")
+    message(STATUS "Add Chrono CUDA collision detection library")
 
-   set(Chrono_collision_cuda_SOURCES
-       collision/cuda/ChCudaUtils.cpp
-       collision/cuda/ChCudaDeviceManager.cpp
-   )
-   set(Chrono_collision_cuda_HEADERS
-       collision/cuda/ChCudaUtils.h
-       collision/cuda/ChCudaDeviceManager.h
-       collision/cuda/ChCudaProfiler.h
-   )
-   source_group("collision\\cuda" FILES ${Chrono_collision_cuda_SOURCES} ${Chrono_collision_cuda_HEADERS})
+    set(Chrono_collision_cuda_SOURCES
+        collision/cuda/ChCudaUtils.cpp
+        collision/cuda/ChCudaDeviceManager.cpp
+        collision/cuda/ChCudaBroadphase.cpp
+        collision/cuda/ChCudaBroadphase.cu
+    )
+    set(Chrono_collision_cuda_HEADERS
+        collision/cuda/ChCudaUtils.h
+        collision/cuda/ChCudaDeviceManager.h
+        collision/cuda/ChCudaProfiler.h
+        collision/cuda/ChCudaCollisionTypes.h
+        collision/cuda/ChCudaBroadphase.h
+    )
+    source_group("collision\\cuda" FILES ${Chrono_collision_cuda_SOURCES} ${Chrono_collision_cuda_HEADERS})
 else()
-   set(Chrono_collision_cuda_SOURCES "")
-   set(Chrono_collision_cuda_HEADERS "")
+    set(Chrono_collision_cuda_SOURCES "")
+    set(Chrono_collision_cuda_HEADERS "")
 endif()
 
 # Bullet collision group
@@ -1447,6 +1451,10 @@ target_include_directories(Chrono_core PUBLIC
 
 target_link_libraries(Chrono_core PUBLIC Eigen3::Eigen)
 
+if (CHRONO_CUDA_FOUND)
+    target_link_libraries(Chrono_core PUBLIC CUDA::cudart)
+endif()
+
 if(CHRONO_THRUST_FOUND)
   target_link_libraries(Chrono_core PRIVATE Thrust::Thrust)
 
@@ -1659,6 +1667,12 @@ install(TARGETS Chrono_core
     ARCHIVE DESTINATION lib
     INCLUDES DESTINATION include/chrono
 )
+
+if (CHRONO_CUDA_FOUND)
+    add_executable(ChCudaBroadphaseTest collision/cuda/ChCudaBroadphaseTest.cpp)
+    target_link_libraries(ChCudaBroadphaseTest Chrono_core)
+    install(TARGETS ChCudaBroadphaseTest DESTINATION bin)
+endif()
 
 # -------------------------------------------------------------------------------------------------
 # Install files

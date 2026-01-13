@@ -3,6 +3,7 @@
 
 #include <cuda_runtime.h>
 #include <string>
+#include <stdexcept>
 
 namespace chrono {
 namespace collision {
