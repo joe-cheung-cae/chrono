@@ -723,7 +723,7 @@ source_group(collision FILES ${Chrono_collision_SOURCES} ${Chrono_collision_HEAD
 # Multicore collision group
 
 if (CHRONO_THRUST_FOUND)
-   message(STATUS "Add Chrono multicore collision detection library")       
+   message(STATUS "Add Chrono multicore collision detection library")
 
    set(Chrono_collision_multicore_SOURCES
        collision/multicore/ChCollisionSystemMulticore.h
@@ -751,6 +751,26 @@ if (CHRONO_THRUST_FOUND)
 else()
    set(Chrono_collision_multicore_SOURCES "")
    set(Chrono_collision_multicore_HEADERS "")
+endif()
+
+# CUDA collision group
+
+if (CHRONO_CUDA_FOUND)
+   message(STATUS "Add Chrono CUDA collision detection library")
+
+   set(Chrono_collision_cuda_SOURCES
+       collision/cuda/ChCudaUtils.cpp
+       collision/cuda/ChCudaDeviceManager.cpp
+   )
+   set(Chrono_collision_cuda_HEADERS
+       collision/cuda/ChCudaUtils.h
+       collision/cuda/ChCudaDeviceManager.h
+       collision/cuda/ChCudaProfiler.h
+   )
+   source_group("collision\\cuda" FILES ${Chrono_collision_cuda_SOURCES} ${Chrono_collision_cuda_HEADERS})
+else()
+   set(Chrono_collision_cuda_SOURCES "")
+   set(Chrono_collision_cuda_HEADERS "")
 endif()
 
 # Bullet collision group
@@ -1303,6 +1323,7 @@ set(Chrono_SOURCES
     ${Chrono_functions_SOURCES}
     ${Chrono_collision_multicore_SOURCES}
     ${Chrono_collision_bullet_SOURCES}
+    ${Chrono_collision_cuda_SOURCES}
     ${Chrono_utils_SOURCES}
     ${Chrono_inputoutput_SOURCES}
 )
@@ -1335,6 +1356,7 @@ set(Chrono_HEADERS
     ${Chrono_functions_HEADERS}
     ${Chrono_collision_multicore_HEADERS}
     ${Chrono_collision_bullet_HEADERS}
+    ${Chrono_collision_cuda_HEADERS}
     ${Chrono_utils_HEADERS}
     ${Chrono_inputoutput_HEADERS}
 )
@@ -1407,12 +1429,14 @@ list(APPEND CH_INCLUDES_BUILD "${CMAKE_SOURCE_DIR}/src")
 list(APPEND CH_INCLUDES_BUILD "${PROJECT_BINARY_DIR}")
 list(APPEND CH_INCLUDES_BUILD "${CMAKE_SOURCE_DIR}/src/chrono/collision/bullet" )
 list(APPEND CH_INCLUDES_BUILD "${CMAKE_SOURCE_DIR}/src/chrono/collision/gimpact" )
+list(APPEND CH_INCLUDES_BUILD "${CMAKE_SOURCE_DIR}/src/chrono/collision/cuda" )
 list(APPEND CH_INCLUDES_BUILD "${CMAKE_SOURCE_DIR}/src/chrono_thirdparty/HACD")
 list(APPEND CH_INCLUDES_BUILD "${CMAKE_SOURCE_DIR}/src/chrono_thirdparty/HACDv2")
 
 list(APPEND CH_INCLUDES_INSTALL "include")
 list(APPEND CH_INCLUDES_INSTALL "include/chrono/collision/bullet")
 list(APPEND CH_INCLUDES_INSTALL "include/chrono/collision/gimpact")
+list(APPEND CH_INCLUDES_INSTALL "include/chrono/collision/cuda")
 list(APPEND CH_INCLUDES_INSTALL "include/chrono_thirdparty/HACD")
 list(APPEND CH_INCLUDES_INSTALL "include/chrono_thirdparty/HACDv2")
 
