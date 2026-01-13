@@ -51,8 +51,7 @@ __global__ void count_objects_per_cell_kernel(
 __global__ void assign_objects_to_cells_kernel(
     const GPU_AABB* __restrict__ aabbs,
     int numObjects,
-    const int* __restrict__ cellCounts,
-    int* __restrict__ cellStarts,
+    int* __restrict__ cellCounters,
     int* __restrict__ objectIndices,
     float3 gridMin,
     float3 gridMax,
@@ -80,28 +79,25 @@ __global__ void assign_objects_to_cells_kernel(
         for (int y = cellMin.y; y <= cellMax.y; ++y) {
             for (int z = cellMin.z; z <= cellMax.z; ++z) {
                 int cellIndex = x + y * gridResolution + z * gridResolution * gridResolution;
-                int position = atomicAdd(&cellStarts[cellIndex], 1);
+                // Get position within this cell's range and store object index
+                int position = atomicAdd(&cellCounters[cellIndex], 1);
                 objectIndices[position] = idx;
             }
         }
     }
 }
 
-// Kernel to reset cell start indices after counting
-__global__ void reset_cell_starts_kernel(
-    const int* __restrict__ cellCounts,
-    int* __restrict__ cellStarts,
-    int numCells) {
-
+// Simple prefix sum kernel (works for small arrays like grid cells)
+__global__ void prefix_sum_kernel(const int* __restrict__ input, int* __restrict__ output, int numElements) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    if (idx >= numCells) return;
+    if (idx >= numElements) return;
 
-    // Simple prefix sum (not optimal, but works for small grids)
+    // Simple sequential prefix sum per thread (inefficient but correct for small grids)
     int sum = 0;
     for (int i = 0; i <= idx; ++i) {
-        if (i < idx) sum += cellCounts[i];
+        if (i < idx) sum += input[i];
     }
-    cellStarts[idx] = sum;
+    output[idx] = sum;
 }
 
 // Broadphase collision detection kernel
@@ -159,6 +155,7 @@ void ChCudaBroadphase::AllocateDeviceMemory() {
     // Allocate cell data
     CUDA_CHECK(cudaMalloc(&d_cellCounts, m_numCells * sizeof(int)));
     CUDA_CHECK(cudaMalloc(&d_cellStarts, m_numCells * sizeof(int)));
+    CUDA_CHECK(cudaMalloc(&d_cellCounters, m_numCells * sizeof(int)));
 
     // Estimate max object indices (each object can be in multiple cells)
     m_maxObjectIndices = MAX_OBJECTS * 8;  // Assume max 8 cells per object
@@ -168,10 +165,12 @@ void ChCudaBroadphase::AllocateDeviceMemory() {
 void ChCudaBroadphase::FreeDeviceMemory() {
     if (d_cellCounts) cudaFree(d_cellCounts);
     if (d_cellStarts) cudaFree(d_cellStarts);
+    if (d_cellCounters) cudaFree(d_cellCounters);
     if (d_objectIndices) cudaFree(d_objectIndices);
 
     d_cellCounts = nullptr;
     d_cellStarts = nullptr;
+    d_cellCounters = nullptr;
     d_objectIndices = nullptr;
 }
 
@@ -186,17 +185,17 @@ void ChCudaBroadphase::BuildGrid(const GPU_AABB* d_aabbs, int numObjects) {
         m_gridMin, m_gridMax, m_cellSize, m_gridResolution);
     CUDA_CHECK(cudaGetLastError());
 
-    // Compute cell start indices
-    reset_cell_starts_kernel<<<(m_numCells + 255) / 256, 256>>>(
+    // Compute cell start indices (prefix sum)
+    prefix_sum_kernel<<<(m_numCells + 255) / 256, 256>>>(
         d_cellCounts, d_cellStarts, m_numCells);
     CUDA_CHECK(cudaGetLastError());
 
-    // Reset cell starts for assignment
-    CUDA_CHECK(cudaMemset(d_cellStarts, 0, m_numCells * sizeof(int)));
+    // Initialize cell counters to starting positions
+    CUDA_CHECK(cudaMemcpy(d_cellCounters, d_cellStarts, m_numCells * sizeof(int), cudaMemcpyDeviceToDevice));
 
     // Launch assignment kernel
     assign_objects_to_cells_kernel<<<blocks, 256>>>(
-        d_aabbs, numObjects, d_cellCounts, d_cellStarts, d_objectIndices,
+        d_aabbs, numObjects, d_cellCounters, d_objectIndices,
         m_gridMin, m_gridMax, m_cellSize, m_gridResolution);
     CUDA_CHECK(cudaGetLastError());
 }

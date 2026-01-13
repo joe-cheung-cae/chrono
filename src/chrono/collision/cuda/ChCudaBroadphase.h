@@ -41,6 +41,7 @@ private:
     // Device memory
     int* d_cellCounts;
     int* d_cellStarts;
+    int* d_cellCounters;  // Temporary counters for assignment
     int* d_objectIndices;
     int m_maxObjectIndices;
 

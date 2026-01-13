@@ -138,6 +138,62 @@ void TestBroadphaseMediumScene() {
     cudaFree(d_manifoldCount);
 }
 
+void TestBroadphaseLargeScene() {
+    std::cout << "Testing broadphase with large scene (10000 objects)" << std::endl;
+
+    ChCudaDeviceManager& deviceManager = ChCudaDeviceManager::GetInstance();
+    ChCudaBroadphase broadphase(&deviceManager);
+
+    // Initialize scene bounds
+    float3 sceneMin = make_float3(-100, -100, -100);
+    float3 sceneMax = make_float3(100, 100, 100);
+    broadphase.Initialize(sceneMin, sceneMax, 5.0f);
+
+    // Create test AABBs
+    const int numObjects = 10000;
+    std::vector<GPU_AABB> hostAABBs(numObjects);
+    srand(time(NULL) + 1);  // Different seed
+    for (int i = 0; i < numObjects; ++i) {
+        float x = (rand() % 200) - 100.0f;
+        float y = (rand() % 200) - 100.0f;
+        float z = (rand() % 200) - 100.0f;
+        hostAABBs[i].min = make_float3(x - 2.0f, y - 2.0f, z - 2.0f);
+        hostAABBs[i].max = make_float3(x + 2.0f, y + 2.0f, z + 2.0f);
+        hostAABBs[i].objectId = i;
+        hostAABBs[i].shapeType = 0;
+        hostAABBs[i].collisionGroup = 1;
+        hostAABBs[i].collisionMask = 1;
+    }
+
+    // Allocate GPU memory
+    GPU_AABB* d_aabbs;
+    CUDA_CHECK(cudaMalloc(&d_aabbs, numObjects * sizeof(GPU_AABB)));
+    CUDA_CHECK(cudaMemcpy(d_aabbs, hostAABBs.data(), numObjects * sizeof(GPU_AABB), cudaMemcpyHostToDevice));
+
+    // Build grid
+    broadphase.BuildGrid(d_aabbs, numObjects);
+
+    // Allocate manifolds
+    GPU_ContactManifold* d_manifolds;
+    int* d_manifoldCount;
+    CUDA_CHECK(cudaMalloc(&d_manifolds, MAX_MANIFOLDS * sizeof(GPU_ContactManifold)));
+    CUDA_CHECK(cudaMalloc(&d_manifoldCount, sizeof(int)));
+
+    // Detect collisions
+    broadphase.DetectCollisions(d_aabbs, d_manifolds, d_manifoldCount);
+
+    // Copy results back
+    int manifoldCount;
+    CUDA_CHECK(cudaMemcpy(&manifoldCount, d_manifoldCount, sizeof(int), cudaMemcpyDeviceToHost));
+
+    std::cout << "Found " << manifoldCount << " potential collision pairs" << std::endl;
+
+    // Cleanup
+    cudaFree(d_aabbs);
+    cudaFree(d_manifolds);
+    cudaFree(d_manifoldCount);
+}
+
 }  // namespace cuda
 }  // namespace collision
 }  // namespace chrono
@@ -146,6 +202,7 @@ int main() {
     try {
         chrono::collision::cuda::TestBroadphaseSmallScene();
         chrono::collision::cuda::TestBroadphaseMediumScene();
+        chrono::collision::cuda::TestBroadphaseLargeScene();
         std::cout << "All tests passed!" << std::endl;
     } catch (const std::exception& e) {
         std::cerr << "Test failed: " << e.what() << std::endl;

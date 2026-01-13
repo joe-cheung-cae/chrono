@@ -71,15 +71,15 @@ gantt
 - [x] Set up profiling tools (Nsight, nvprof)
 
 ### Checkpoint 2.2: Broadphase Implementation
-**Status**: ⏳ Pending
+**Status**: ✅ Completed
 **Tasks**:
-- [ ] Implement GPU AABB data structures
-- [ ] Create spatial grid construction kernel
-- [ ] Develop broadphase collision detection kernel
-- [ ] Implement grid cell processing
-- [ ] Add overlap pair generation
-- [ ] Optimize memory access patterns
-- [ ] Test with various scene sizes
+- [x] Implement GPU AABB data structures
+- [x] Create spatial grid construction kernel
+- [x] Develop broadphase collision detection kernel
+- [x] Implement grid cell processing
+- [x] Add overlap pair generation
+- [x] Optimize memory access patterns
+- [x] Test with various scene sizes
 
 **Technical Details**:
 ```cpp
