@@ -92,15 +92,15 @@ gantt
 ```
 
 ### Checkpoint 2.3: Narrow Phase Implementation
-**Status**: ⏳ Pending
+**Status**: ✅ Completed
 **Tasks**:
-- [ ] Implement sphere-sphere collision kernel
-- [ ] Develop box-box collision kernel
-- [ ] Create capsule-capsule collision kernel
-- [ ] Implement convex mesh collision detection
-- [ ] Add contact point generation
-- [ ] Optimize shape-type dispatch
-- [ ] Test collision accuracy
+- [x] Implement sphere-sphere collision kernel
+- [x] Develop box-box collision kernel
+- [x] Create capsule-capsule collision kernel
+- [x] Implement convex mesh collision detection
+- [x] Add contact point generation
+- [x] Optimize shape-type dispatch
+- [x] Test collision accuracy
 
 **Shape Type Priority**:
 1. Sphere-Sphere (Highest priority)
