@@ -25,9 +25,9 @@ gantt
     Performance Targets Met   :milestone, m5, 2026-05-30, 0d
 ```
 
-## Phase 1: Research and Design (Weeks 1-4)
+## Phase 1: Research and Design
 
-### Checkpoint 1.1: Architecture Review (Week 1)
+### Checkpoint 1.1: Architecture Review
 **Status**: ✅ Completed
 **Tasks**:
 - [x] Finalize overall system architecture
@@ -35,7 +35,7 @@ gantt
 - [x] Identify integration points with Chrono
 - [x] Document architecture decisions
 
-### Checkpoint 1.2: GPU Data Structures (Week 2)
+### Checkpoint 1.2: GPU Data Structures
 **Status**: ✅ Completed
 **Tasks**:
 - [x] Design AABB structure for GPU
@@ -44,7 +44,7 @@ gantt
 - [x] Implement memory alignment strategies
 - [x] Document data structure specifications
 
-### Checkpoint 1.3: Algorithm Prototypes (Week 3-4)
+### Checkpoint 1.3: Algorithm Prototypes
 **Status**: ✅ Completed
 **Tasks**:
 - [x] Implement CPU reference for broadphase grid algorithm
@@ -59,9 +59,9 @@ gantt
 - CPU reference implementations
 - Test cases and benchmarks
 
-## Phase 2: Core Implementation (Weeks 5-12)
+## Phase 2: Core Implementation
 
-### Checkpoint 2.1: CUDA Environment Setup (Week 5)
+### Checkpoint 2.1: CUDA Environment Setup
 **Status**: ✅ Completed
 **Tasks**:
 - [x] Set up CUDA development environment
@@ -70,7 +70,7 @@ gantt
 - [x] Create CUDA device management system
 - [x] Set up profiling tools (Nsight, nvprof)
 
-### Checkpoint 2.2: Broadphase Implementation (Week 6-8)
+### Checkpoint 2.2: Broadphase Implementation
 **Status**: ⏳ Pending
 **Tasks**:
 - [ ] Implement GPU AABB data structures
@@ -91,7 +91,7 @@ gantt
 5. Memory coalescing optimization
 ```
 
-### Checkpoint 2.3: Narrow Phase Implementation (Week 9-11)
+### Checkpoint 2.3: Narrow Phase Implementation
 **Status**: ⏳ Pending
 **Tasks**:
 - [ ] Implement sphere-sphere collision kernel
@@ -109,7 +109,7 @@ gantt
 4. Capsule-Capsule
 5. Convex-Convex
 
-### Checkpoint 2.4: Memory Management (Week 12)
+### Checkpoint 2.4: Memory Management
 **Status**: ⏳ Pending
 **Tasks**:
 - [ ] Implement GPU memory pool
@@ -125,9 +125,9 @@ gantt
 - Memory management system
 - Initial performance benchmarks
 
-## Phase 3: Optimization (Weeks 13-18)
+## Phase 3: Optimization
 
-### Checkpoint 3.1: Performance Profiling (Week 13)
+### Checkpoint 3.1: Performance Profiling
 **Status**: ⏳ Pending
 **Tasks**:
 - [ ] Profile broadphase kernel performance
@@ -136,7 +136,7 @@ gantt
 - [ ] Measure GPU occupancy
 - [ ] Document performance baseline
 
-### Checkpoint 3.2: Broadphase Optimization (Week 14-15)
+### Checkpoint 3.2: Broadphase Optimization
 **Status**: ⏳ Pending
 **Tasks**:
 - [ ] Optimize grid cell sizing
@@ -151,7 +151,7 @@ gantt
 - <5% memory bandwidth waste
 - Minimal atomic operation contention
 
-### Checkpoint 3.3: Narrow Phase Optimization (Week 16)
+### Checkpoint 3.3: Narrow Phase Optimization
 **Status**: ⏳ Pending
 **Tasks**:
 - [ ] Optimize shape-type dispatch
@@ -161,7 +161,7 @@ gantt
 - [ ] Improve memory locality
 - [ ] Add specialized algorithms for common cases
 
-### Checkpoint 3.4: Memory Optimization (Week 17-18)
+### Checkpoint 3.4: Memory Optimization
 **Status**: ⏳ Pending
 **Tasks**:
 - [ ] Implement zero-copy memory where possible
@@ -177,9 +177,9 @@ gantt
 - Memory usage optimization
 - Benchmark comparisons with CPU version
 
-## Phase 4: Integration and Testing (Weeks 19-24)
+## Phase 4: Integration and Testing
 
-### Checkpoint 4.1: Chrono Integration (Week 19-20)
+### Checkpoint 4.1: Chrono Integration
 **Status**: ⏳ Pending
 **Tasks**:
 - [ ] Create CUDA collision system wrapper
@@ -199,7 +199,7 @@ gantt
 5. Error handling and recovery strategies
 ```
 
-### Checkpoint 4.2: Comprehensive Testing (Week 21-23)
+### Checkpoint 4.2: Comprehensive Testing
 **Status**: ⏳ Pending
 **Tasks**:
 - [ ] Develop unit test suite
@@ -216,7 +216,7 @@ gantt
 - Various shape combinations
 - Edge cases and boundary conditions
 
-### Checkpoint 4.3: Performance Benchmarking (Week 24)
+### Checkpoint 4.3: Performance Benchmarking
 **Status**: ⏳ Pending
 **Tasks**:
 - [ ] Final performance testing

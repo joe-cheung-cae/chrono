@@ -109,28 +109,28 @@ graph LR
 
 ## 4. Development Plan
 
-### 4.1 Phase 1: Research and Design (2-3 weeks)
+### 4.1 Phase 1: Research and Design
 
 - [x] Analyze current Bullet implementation
 - [ ] Benchmark current performance
 - [ ] Design GPU data structures
 - [ ] Create CUDA algorithm prototypes
 
-### 4.2 Phase 2: Core Implementation (4-6 weeks)
+### 4.2 Phase 2: Core Implementation
 
 - [ ] Implement GPU broadphase detection
 - [ ] Implement GPU narrow phase algorithms
 - [ ] Create memory management system
 - [ ] Develop CUDA-C++ integration layer
 
-### 4.3 Phase 3: Optimization (3-4 weeks)
+### 4.3 Phase 3: Optimization
 
 - [ ] Profile and optimize kernels
 - [ ] Implement memory pooling
 - [ ] Add multi-GPU support
 - [ ] Optimize data transfer
 
-### 4.4 Phase 4: Integration and Testing (3-4 weeks)
+### 4.4 Phase 4: Integration and Testing
 
 - [ ] Integrate with Chrono collision system
 - [ ] Implement fallback mechanism
