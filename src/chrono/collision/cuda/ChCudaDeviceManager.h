@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <cuda_runtime.h>
+#include "ChCudaMemoryPool.h"
 
 namespace chrono {
 namespace collision {
@@ -38,16 +39,14 @@ public:
     /// Allocate device memory
     template<typename T>
     T* AllocateDeviceMemory(size_t count) {
-        T* ptr = nullptr;
-        CUDA_CHECK(cudaMalloc(&ptr, count * sizeof(T)));
-        return ptr;
+        return static_cast<T*>(cuda::ChCudaMemoryPool::GetInstance().AllocateDevice(count * sizeof(T)));
     }
 
     /// Free device memory
     template<typename T>
     void FreeDeviceMemory(T* ptr) {
         if (ptr) {
-            CUDA_CHECK(cudaFree(ptr));
+            cuda::ChCudaMemoryPool::GetInstance().FreeDevice(ptr);
         }
     }
 
@@ -72,16 +71,14 @@ public:
     /// Allocate pinned host memory
     template<typename T>
     T* AllocatePinnedMemory(size_t count) {
-        T* ptr = nullptr;
-        CUDA_CHECK(cudaMallocHost(&ptr, count * sizeof(T)));
-        return ptr;
+        return static_cast<T*>(cuda::ChCudaMemoryPool::GetInstance().AllocatePinned(count * sizeof(T)));
     }
 
     /// Free pinned host memory
     template<typename T>
     void FreePinnedMemory(T* ptr) {
         if (ptr) {
-            CUDA_CHECK(cudaFreeHost(ptr));
+            cuda::ChCudaMemoryPool::GetInstance().FreePinned(ptr);
         }
     }
 
@@ -90,6 +87,12 @@ public:
 
     /// Print memory usage
     void PrintMemoryUsage() const;
+
+    /// Get memory pool statistics
+    void GetMemoryPoolStats(size_t& totalAllocated, size_t& totalUsed, size_t& poolSize) const;
+
+    /// Print detailed memory pool report
+    void PrintMemoryPoolReport() const;
 
 private:
     ChCudaDeviceManager();

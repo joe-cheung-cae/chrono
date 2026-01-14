@@ -763,6 +763,7 @@ if (CHRONO_CUDA_FOUND)
         collision/cuda/ChCudaDeviceManager.cpp
         collision/cuda/ChCudaBroadphase.cpp
         collision/cuda/ChCudaBroadphase.cu
+        collision/cuda/ChCudaMemoryPool.cpp
     )
     set(Chrono_collision_cuda_HEADERS
         collision/cuda/ChCudaUtils.h
@@ -770,8 +771,12 @@ if (CHRONO_CUDA_FOUND)
         collision/cuda/ChCudaProfiler.h
         collision/cuda/ChCudaCollisionTypes.h
         collision/cuda/ChCudaBroadphase.h
+        collision/cuda/ChCudaMemoryPool.h
     )
     source_group("collision\\cuda" FILES ${Chrono_collision_cuda_SOURCES} ${Chrono_collision_cuda_HEADERS})
+
+    # Set CUDA language for CUDA-related source files
+    set_source_files_properties(${Chrono_collision_cuda_SOURCES} PROPERTIES LANGUAGE CUDA)
 else()
     set(Chrono_collision_cuda_SOURCES "")
     set(Chrono_collision_cuda_HEADERS "")
@@ -1672,6 +1677,10 @@ if (CHRONO_CUDA_FOUND)
     add_executable(ChCudaBroadphaseTest collision/cuda/ChCudaBroadphaseTest.cpp)
     target_link_libraries(ChCudaBroadphaseTest Chrono_core)
     install(TARGETS ChCudaBroadphaseTest DESTINATION bin)
+
+    add_executable(ChCudaMemoryTest collision/cuda/test_memory_management.cpp)
+    target_link_libraries(ChCudaMemoryTest Chrono_core)
+    install(TARGETS ChCudaMemoryTest DESTINATION bin)
 endif()
 
 # -------------------------------------------------------------------------------------------------

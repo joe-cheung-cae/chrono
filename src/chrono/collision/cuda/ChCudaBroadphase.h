@@ -2,6 +2,7 @@
 
 #include "ChCudaCollisionTypes.h"
 #include "ChCudaDeviceManager.h"
+#include "ChCudaMemoryPool.h"
 #include <vector>
 
 namespace chrono {
@@ -38,11 +39,11 @@ private:
     int m_gridResolution;
     int m_numCells;
 
-    // Device memory
-    int* d_cellCounts;
-    int* d_cellStarts;
-    int* d_cellCounters;  // Temporary counters for assignment
-    int* d_objectIndices;
+    // Device memory - using RAII buffers
+    ChCudaDeviceBuffer<int> d_cellCounts;
+    ChCudaDeviceBuffer<int> d_cellStarts;
+    ChCudaDeviceBuffer<int> d_cellCounters;  // Temporary counters for assignment
+    ChCudaDeviceBuffer<int> d_objectIndices;
     int m_maxObjectIndices;
 
     // Helper functions

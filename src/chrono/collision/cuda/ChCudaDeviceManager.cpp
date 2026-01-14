@@ -1,5 +1,6 @@
 #include "ChCudaDeviceManager.h"
 #include "ChCudaUtils.h"
+#include "ChCudaMemoryPool.h"
 #include <iostream>
 #include <algorithm>
 
@@ -47,6 +48,10 @@ void ChCudaDeviceManager::Initialize() {
         }
 
         SetDevice(bestDevice);
+
+        // Initialize memory pool
+        cuda::ChCudaMemoryPool::GetInstance().Initialize();
+
         m_initialized = true;
 
         std::cout << "CUDA Device Manager initialized with device " << m_currentDevice << std::endl;
@@ -63,6 +68,9 @@ void ChCudaDeviceManager::Shutdown() {
     }
 
     try {
+        // Shutdown memory pool first
+        cuda::ChCudaMemoryPool::GetInstance().Shutdown();
+
         CUDA_CHECK(cudaDeviceReset());
     } catch (const std::exception& e) {
         std::cerr << "Error during CUDA device reset: " << e.what() << std::endl;
@@ -123,6 +131,17 @@ void ChCudaDeviceManager::PrintMemoryUsage() const {
     std::cout << "  Total: " << total / (1024 * 1024) << " MB" << std::endl;
     std::cout << "  Free:  " << free / (1024 * 1024) << " MB" << std::endl;
     std::cout << "  Used:  " << (total - free) / (1024 * 1024) << " MB" << std::endl;
+
+    // Also print memory pool stats
+    PrintMemoryPoolReport();
+}
+
+void ChCudaDeviceManager::GetMemoryPoolStats(size_t& totalAllocated, size_t& totalUsed, size_t& poolSize) const {
+    cuda::ChCudaMemoryPool::GetInstance().GetMemoryStats(totalAllocated, totalUsed, poolSize);
+}
+
+void ChCudaDeviceManager::PrintMemoryPoolReport() const {
+    cuda::ChCudaMemoryPool::GetInstance().PrintMemoryReport();
 }
 
 } // namespace collision

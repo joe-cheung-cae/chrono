@@ -2,6 +2,7 @@
 
 #include "ChCudaCollisionTypes.h"
 #include "ChCudaDeviceManager.h"
+#include "ChCudaMemoryPool.h"
 #include <vector>
 
 namespace chrono {
@@ -71,9 +72,9 @@ private:
     const GPU_ShapeData* d_shapeData;
     int m_numShapes;
 
-    // Convex hull data (if needed)
-    float3* d_convexVertices;
-    int* d_convexFaces;
+    // Convex hull data (if needed) - using RAII buffers
+    ChCudaDeviceBuffer<float3> d_convexVertices;
+    ChCudaDeviceBuffer<int> d_convexFaces;
     int m_maxConvexVertices;
     int m_maxConvexFaces;
 

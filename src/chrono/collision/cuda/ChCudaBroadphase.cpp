@@ -12,9 +12,6 @@ ChCudaBroadphase::ChCudaBroadphase(ChCudaDeviceManager* deviceManager)
       m_gridMax(make_float3(0, 0, 0)),
       m_cellSize(1.0f),
       m_gridResolution(GRID_RESOLUTION),
-      d_cellCounts(nullptr),
-      d_cellStarts(nullptr),
-      d_objectIndices(nullptr),
       m_maxObjectIndices(0) {
     m_numCells = m_gridResolution * m_gridResolution * m_gridResolution;
 }

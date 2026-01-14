@@ -150,52 +150,46 @@ __global__ void broadphase_collision_kernel(
 }
 
 void ChCudaBroadphase::AllocateDeviceMemory() {
-    FreeDeviceMemory();
-
-    // Allocate cell data
-    CUDA_CHECK(cudaMalloc(&d_cellCounts, m_numCells * sizeof(int)));
-    CUDA_CHECK(cudaMalloc(&d_cellStarts, m_numCells * sizeof(int)));
-    CUDA_CHECK(cudaMalloc(&d_cellCounters, m_numCells * sizeof(int)));
+    // Allocate cell data using RAII buffers
+    d_cellCounts.Resize(m_numCells);
+    d_cellStarts.Resize(m_numCells);
+    d_cellCounters.Resize(m_numCells);
 
     // Estimate max object indices (each object can be in multiple cells)
     m_maxObjectIndices = MAX_OBJECTS * 8;  // Assume max 8 cells per object
-    CUDA_CHECK(cudaMalloc(&d_objectIndices, m_maxObjectIndices * sizeof(int)));
+    d_objectIndices.Resize(m_maxObjectIndices);
 }
 
 void ChCudaBroadphase::FreeDeviceMemory() {
-    if (d_cellCounts) cudaFree(d_cellCounts);
-    if (d_cellStarts) cudaFree(d_cellStarts);
-    if (d_cellCounters) cudaFree(d_cellCounters);
-    if (d_objectIndices) cudaFree(d_objectIndices);
-
-    d_cellCounts = nullptr;
-    d_cellStarts = nullptr;
-    d_cellCounters = nullptr;
-    d_objectIndices = nullptr;
+    // RAII buffers automatically free memory
+    d_cellCounts = ChCudaDeviceBuffer<int>();
+    d_cellStarts = ChCudaDeviceBuffer<int>();
+    d_cellCounters = ChCudaDeviceBuffer<int>();
+    d_objectIndices = ChCudaDeviceBuffer<int>();
 }
 
 void ChCudaBroadphase::BuildGrid(const GPU_AABB* d_aabbs, int numObjects) {
     // Reset cell counts
-    CUDA_CHECK(cudaMemset(d_cellCounts, 0, m_numCells * sizeof(int)));
+    CUDA_CHECK(cudaMemset(d_cellCounts.Get(), 0, m_numCells * sizeof(int)));
 
     // Launch count kernel
     int blocks = (numObjects + 255) / 256;
     count_objects_per_cell_kernel<<<blocks, 256>>>(
-        d_aabbs, numObjects, d_cellCounts,
+        d_aabbs, numObjects, d_cellCounts.Get(),
         m_gridMin, m_gridMax, m_cellSize, m_gridResolution);
     CUDA_CHECK(cudaGetLastError());
 
     // Compute cell start indices (prefix sum)
     prefix_sum_kernel<<<(m_numCells + 255) / 256, 256>>>(
-        d_cellCounts, d_cellStarts, m_numCells);
+        d_cellCounts.Get(), d_cellStarts.Get(), m_numCells);
     CUDA_CHECK(cudaGetLastError());
 
     // Initialize cell counters to starting positions
-    CUDA_CHECK(cudaMemcpy(d_cellCounters, d_cellStarts, m_numCells * sizeof(int), cudaMemcpyDeviceToDevice));
+    CUDA_CHECK(cudaMemcpy(d_cellCounters.Get(), d_cellStarts.Get(), m_numCells * sizeof(int), cudaMemcpyDeviceToDevice));
 
     // Launch assignment kernel
     assign_objects_to_cells_kernel<<<blocks, 256>>>(
-        d_aabbs, numObjects, d_cellCounters, d_objectIndices,
+        d_aabbs, numObjects, d_cellCounters.Get(), d_objectIndices.Get(),
         m_gridMin, m_gridMax, m_cellSize, m_gridResolution);
     CUDA_CHECK(cudaGetLastError());
 }
@@ -207,7 +201,7 @@ void ChCudaBroadphase::DetectCollisions(const GPU_AABB* d_aabbs, GPU_ContactMani
     // Launch broadphase collision kernel
     int blocks = (m_numCells + 255) / 256;
     broadphase_collision_kernel<<<blocks, 256>>>(
-        d_aabbs, d_cellStarts, d_cellCounts, d_objectIndices,
+        d_aabbs, d_cellStarts.Get(), d_cellCounts.Get(), d_objectIndices.Get(),
         d_manifolds, d_manifoldCount, m_gridResolution);
     CUDA_CHECK(cudaGetLastError());
 }
